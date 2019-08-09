@@ -10,9 +10,12 @@ class Article extends Model
 {
     const SHORT_TEXT_LENGTH = 140;
 
+    const STATUS_ACTIVE = 1;
+    const STATUS_DISABLED = 0;
+
     protected $table = 'articles';
 
-    protected $fillable = ['title', 'text', 'views', 'likes', 'image'];
+    protected $fillable = ['title', 'text', 'views', 'likes', 'image', 'status'];
 
 
     public function getShortText()
