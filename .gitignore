@@ -1,0 +1,17 @@
+/vendor
+/.idea
+database/database.sqlite
+Homestead.json
+Homestead.yaml
+.env
+/storage
+nginx/
+
+
+/node_modules
+/package-lock.json
+/public/images
+/public/fonts
+/public/mix-manifest.json
+/public/css
+/public/js
