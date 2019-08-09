@@ -4,6 +4,8 @@
 namespace App\Repositories;
 
 
+use App\Entities\Article;
+
 class ArticleRepository extends ARepository
 {
     /**
@@ -12,7 +14,9 @@ class ArticleRepository extends ARepository
      */
     public function get($perPage)
     {
-        return $this->model->orderBy('created_at', 'desc')->paginate($perPage);
+        return $this->model->orderBy('created_at', 'desc')
+            ->where('status', Article::STATUS_ACTIVE)
+            ->paginate($perPage);
     }
 
 
