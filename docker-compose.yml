@@ -1,0 +1,32 @@
+version: '2'
+services:
+    web:
+        build:
+            context: ./
+            dockerfile: web.docker
+        volumes:
+            - ./:/var/www
+        ports:
+            - "2222:80"
+        links:
+            - app
+    app:
+        build:
+            context: ./
+            dockerfile: app.docker
+        volumes:
+            - ./:/var/www
+        links:
+            - blog_database
+    blog_database:
+        image: mysql:5.7
+        container_name: blog_database
+        environment:
+        - MYSQL_ROOT_PASSWORD=root
+        - MYSQL_DATABASE=my_blog
+        - MYSQL_USER=my_blog
+        - MYSQL_PASSWORD=my_blog
+        ports:
+            - "33066:3306"
+        volumes:
+            - ./data:/var/lib/mysql
