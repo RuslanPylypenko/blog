@@ -84,12 +84,31 @@ class ArticleService
     }
 
 
+    /**
+     * @param $id
+     * @param array $article
+     * @return mixed
+     */
+    public function updateArticle($id, array $article)
+    {
+        return $this->repository->update($id, $article);
+    }
+
+
+    /**
+     * @param $id
+     * @return mixed
+     */
     public function deleteArticle($id)
     {
         return $this->repository->delete($id);
     }
 
 
+    /**
+     * @param $id
+     * @return mixed
+     */
     public function disableArticle($id)
     {
         return $this->repository->update($id, ['status' => Article::STATUS_DISABLED]);
