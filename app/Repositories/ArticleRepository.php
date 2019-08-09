@@ -18,6 +18,11 @@ class ArticleRepository extends ARepository
 
     public function findOne($id)
     {
-        return $this->model->where('id', $id)->first();
+        return $this->model->where('id', $id)->firstOrFail();
+    }
+
+    public function delete($id)
+    {
+        return $this->model->where('id', $id)->delete();
     }
 }

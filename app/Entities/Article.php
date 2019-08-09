@@ -12,6 +12,8 @@ class Article extends Model
 
     protected $table = 'articles';
 
+    protected $fillable = ['title', 'text', 'views', 'likes', 'image'];
+
 
     public function getShortText()
     {

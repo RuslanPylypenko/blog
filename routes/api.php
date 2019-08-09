@@ -24,3 +24,7 @@ Route::resource('/articles', 'Rest\ArticlesController')->only([
 
 Route::post('/articles/like/{id}', 'Rest\ArticlesController@like');
 
+Route::post('/articles/create', 'Rest\ArticlesController@create')->name('articles.create');
+
+Route::delete('/articles/{id}', 'Rest\ArticlesController@delete')->name('articles.delete');
+
