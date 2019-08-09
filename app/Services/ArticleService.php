@@ -4,6 +4,7 @@
 namespace App\Services;
 
 
+use App\Entities\Article;
 use App\Repositories\ArticleRepository;
 use Faker\Factory as Faker;
 use Illuminate\Support\Facades\File;
@@ -89,4 +90,8 @@ class ArticleService
     }
 
 
+    public function disableArticle($id)
+    {
+        return $this->repository->update($id, ['status' => Article::STATUS_DISABLED]);
+    }
 }

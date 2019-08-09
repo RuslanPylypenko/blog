@@ -66,4 +66,13 @@ class ArticlesController extends Controller
 
         return $article;
     }
+
+
+    public function disableArticle($id = null)
+    {
+        $this->service->deleteArticle($id);
+        return [
+            'success' => true
+        ];
+    }
 }

@@ -28,3 +28,5 @@ Route::post('/articles/create', 'Rest\ArticlesController@create')->name('article
 
 Route::delete('/articles/{id}', 'Rest\ArticlesController@delete')->name('articles.delete');
 
+Route::patch('/articles/disable/{id}', 'Rest\ArticlesController@disableArticle')->name('articles.disable');
+
