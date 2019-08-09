@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use App\Entities\Article;
+use App\Repositories\ArticleRepository;
+use App\Services\ArticleService;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -13,7 +16,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+
+        $this->app->bind(ArticleService::class, function () {
+            return new ArticleService(new ArticleRepository(new Article()));
+        });
     }
 
     /**

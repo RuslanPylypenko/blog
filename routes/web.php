@@ -11,10 +11,14 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
-
 Auth::routes();
+
+Route::get('/articles', 'ArticlesController@index')->name('articles');
+Route::get('/articles/{id}', 'ArticlesController@show')
+    ->where(['id' => '[0-9]+'])
+    ->name('article');
+
+Route::post('/articles/like', 'ArticlesController@like')
+    ->name('article-like');
 
 Route::get('/home', 'HomeController@index')->name('home');

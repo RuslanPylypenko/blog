@@ -25,7 +25,7 @@ class ArticlesTableSeeder extends Seeder
         for($i = 0; $i < 100; $i++){
             Db::table('articles')->insert([
                 'title' => rtrim($faker->text(rand(20, 50)), '.'),
-                'text' => $faker->text(rand(300, 600)),
+                'text' => $faker->text(rand(1400, 2000)),
                 'views' => rand(0, 600),
                 'likes' => rand(0, 300),
                 'image' => $faker->image($filepath,400,300, false, false) ,
