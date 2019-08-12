@@ -18,11 +18,13 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 
+#articles
+
 Route::resource('/articles', 'Rest\ArticlesController')->only([
     'index', 'show'
 ]);
 
-Route::post('/articles/like/{id}', 'Rest\ArticlesController@like');
+Route::post('/articles/like/{id}', 'Rest\ArticlesController@like')->name('articles.like');
 
 Route::post('/articles/create', 'Rest\ArticlesController@create')->name('articles.create');
 
@@ -32,3 +34,7 @@ Route::patch('/articles/disable/{id}', 'Rest\ArticlesController@disableArticle')
 
 Route::post('/articles/update/{id}', 'Rest\ArticlesController@update')->name('articles.update');
 
+
+#Comments
+
+Route::post('/articles/{article_id}/comment/create', 'Rest\ArticlesController@createComment')->name('comment.create');

@@ -17,6 +17,11 @@ class ArticleService
      */
     private $repository;
 
+    /**
+     * @var
+     */
+    private $commentRepository;
+
     public function __construct(ArticleRepository $repository)
     {
         $this->repository = $repository;
@@ -114,5 +119,10 @@ class ArticleService
     public function disableArticle($id)
     {
         return $this->repository->update($id, ['status' => Article::STATUS_DISABLED]);
+    }
+
+    public function addComment($article_id, $user_id, $text)
+    {
+
     }
 }
