@@ -22,12 +22,17 @@ class ArticlesController extends Controller
         $this->service = $service;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $articles = $this->service->get(self::ARTICLE_PER_PAGE);
+        $sort = $request->input('sort', 'created_at');
+        $dir = $request->input('dir', 'desc');
+
+        $articles = $this->service->get(self::ARTICLE_PER_PAGE, $sort, $dir);
 
         return view('articles/index', [
-            'articles' => $articles
+            'articles' => $articles,
+            'sort' => $sort,
+            'dir' => $dir,
         ]);
     }
 

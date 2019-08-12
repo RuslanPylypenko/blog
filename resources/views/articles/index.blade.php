@@ -7,7 +7,27 @@
 
 @section('content')
     <div class="container">
-        <h1>Articles</h1>
+
+        <div class="row">
+            <div class="col-sm-9"><h1>Articles</h1></div>
+            <div class="col-sm-3">
+                <div class="text-right">
+                    <div class="dropdown">
+                        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                            {{$sort}} {{$dir}}
+                        </button>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="?sort=views&dir=desc&page={{$articles->currentPage()}}">views desc</a>
+                            <a class="dropdown-item" href="?sort=views&dir=asc&page={{$articles->currentPage()}}">views asc</a>
+                            <a class="dropdown-item" href="?sort=likes&dir=desc&page={{$articles->currentPage()}}">likes desc</a>
+                            <a class="dropdown-item" href="?sort=likes&dir=asc&page={{$articles->currentPage()}}">likes asc</a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
 
         @foreach ($articles as $article)
             <div class="card">
@@ -65,7 +85,7 @@
             <hr>
         @endforeach
 
-        {{ $articles->links() }}
+        {{ $articles->appends(['sort' => $sort, 'dir' => $dir])->links() }}
 
 
     </div>

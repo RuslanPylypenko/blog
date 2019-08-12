@@ -33,11 +33,13 @@ class ArticleService
 
     /**
      * @param int $perPage
+     * @param string $sort
+     * @param string $dir
      * @return mixed
      */
-    public function get($perPage = 12)
+    public function get($perPage, $sort, $dir)
     {
-        return $this->repository->get($perPage);
+        return $this->repository->get($perPage, $sort, $dir);
     }
 
     /**

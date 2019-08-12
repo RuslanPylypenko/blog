@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreArticlePost;
 use App\Http\Requests\UpdateArticlePost;
 use App\Services\ArticleService;
+use Illuminate\Http\Request;
 
 class ArticlesController extends Controller
 {
@@ -24,9 +25,12 @@ class ArticlesController extends Controller
         $this->service = $service;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $articles = $this->service->get(self::ARTICLE_PER_PAGE);
+        $sort = $request->input('sort', 'date');
+        $dir = $request->input('dir', 'created_at');
+
+        $articles = $this->service->get(self::ARTICLE_PER_PAGE, $sort, $dir);
 
         return $articles;
     }
