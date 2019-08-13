@@ -17,6 +17,16 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+#test
+
+Route::get('/test', function (Request $request){
+
+})->middleware('api.auth');
+
+#user
+
+Route::post('/user/register', 'Auth\ApiRegisterController@register')->name('user.register');
+
 
 #articles
 
