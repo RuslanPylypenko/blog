@@ -140,7 +140,7 @@ class ArticlesController extends Controller
     public function createComment($article_id, CreateComment $request)
     {
         try {
-            $article = $this->articleService->getById($article_id);
+
 
             $comment = [
                 'text' => $request->input('text'),
@@ -150,6 +150,7 @@ class ArticlesController extends Controller
 
             $this->commentService->createComment($comment);
 
+            $article = $this->articleService->getByIdWithComments($article_id);
         } catch (\Exception $e) {
             return ['success' => false, 'message' => $e->getMessage()];
         }

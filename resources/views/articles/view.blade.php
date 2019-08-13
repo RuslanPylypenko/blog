@@ -50,7 +50,7 @@
             </div>
         </div>
 
-        @if(!empty($comments))
+        @if(!empty($article->comments))
             <hr>
 
             <div class="card">
