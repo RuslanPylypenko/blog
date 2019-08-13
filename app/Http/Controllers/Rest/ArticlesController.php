@@ -9,6 +9,7 @@ use App\Http\Requests\CreateComment;
 use App\Http\Requests\StoreArticlePost;
 use App\Http\Requests\UpdateArticlePost;
 use App\Services\ArticleService;
+use App\Services\CommentService;
 use Illuminate\Http\Request;
 
 class ArticlesController extends Controller
@@ -18,62 +19,92 @@ class ArticlesController extends Controller
     /**
      * @var ArticleService
      */
-    private $service;
+    private $articleService;
+
+    /**
+     * @var CommentService
+     */
+    private $commentService;
 
 
-    public function __construct(ArticleService $service)
+    public function __construct(
+        ArticleService $articleService,
+        CommentService $commentService
+    )
     {
-        $this->service = $service;
+        $this->articleService = $articleService;
+        $this->commentService = $commentService;
     }
 
     public function index(Request $request)
     {
-        $sort = $request->input('sort', 'date');
-        $dir = $request->input('dir', 'created_at');
+        try {
+            $sort = $request->input('sort', 'date');
+            $dir = $request->input('dir', 'created_at');
 
-        $articles = $this->service->get(self::ARTICLE_PER_PAGE, $sort, $dir);
+            $articles = $this->articleService->get(self::ARTICLE_PER_PAGE, $sort, $dir);
+        } catch (\Exception $e) {
+            return ['success' => false, 'message' => $e->getMessage()];
+        }
 
         return $articles;
     }
 
     public function show($id = null)
     {
-        $article = $this->service->getById($id);
-        $this->service->addView($id);
-
+        try {
+            $article = $this->articleService->getByIdWithComments($id);
+            $this->articleService->addView($id);
+        } catch (\Exception $e) {
+            return ['success' => false, 'message' => $e->getMessage()];
+        }
         return $article;
     }
 
     public function create(StoreArticlePost $articlePost)
     {
-        $article = [
-            'title' => $articlePost->input('title'),
-            'text' => $articlePost->input('text'),
-        ];
+        try {
+            $article = [
+                'title' => $articlePost->input('title'),
+                'text' => $articlePost->input('text'),
+            ];
+        } catch (\Exception $e) {
+            return ['success' => false, 'message' => $e->getMessage()];
+        }
 
-        return $this->service->createArticle($article);
+        return $this->articleService->createArticle($article);
     }
 
 
     public function update($id, UpdateArticlePost $articlePost)
     {
-        $article = [
-            'title' => $articlePost->input('title'),
-            'text' => $articlePost->input('text'),
-        ];
 
-        foreach ($article as $item => &$value) {
-            if (!$article[$item]) unset($article[$item]);
+        try {
+            $article = [
+                'title' => $articlePost->input('title'),
+                'text' => $articlePost->input('text'),
+            ];
+
+            foreach ($article as $item => &$value) {
+                if (!$article[$item]) unset($article[$item]);
+            }
+
+            $this->articleService->updateArticle($id, $article);
+            $article = $this->articleService->getById($id);
+        } catch (\Exception $e) {
+            return ['success' => false, 'message' => $e->getMessage()];
         }
 
-        $this->service->updateArticle($id, $article);
-
-        return ['success' => true];
+        return ['success' => true, 'article' => $article];
     }
 
     public function delete($id)
     {
-        $this->service->deleteArticle($id);
+        try {
+            $this->articleService->deleteArticle($id);
+        } catch (\Exception $e) {
+            return ['success' => false, 'message' => $e->getMessage()];
+        }
 
         return [
             'success' => true
@@ -83,16 +114,24 @@ class ArticlesController extends Controller
 
     public function like($id = null)
     {
-        $article = $this->service->getById($id);
-        $this->service->likeArticle($id);
-
+        try {
+            $article = $this->articleService->getById($id);
+            $this->articleService->likeArticle($id);
+        } catch (\Exception $e) {
+            return ['success' => false, 'message' => $e->getMessage()];
+        }
         return $article;
     }
 
 
     public function disableArticle($id = null)
     {
-        $this->service->deleteArticle($id);
+        try {
+            $this->articleService->disableArticle($id);
+        } catch (\Exception $e) {
+            return ['success' => false, 'message' => $e->getMessage()];
+        }
+
         return [
             'success' => true
         ];
@@ -101,7 +140,15 @@ class ArticlesController extends Controller
     public function createComment($article_id, CreateComment $request)
     {
         try {
-            $article = $this->service->getById($article_id);
+            $article = $this->articleService->getById($article_id);
+
+            $comment = [
+                'text' => $request->input('text'),
+                'user_id' => $request->input('user_id'),
+                'article_id' => $article_id
+            ];
+
+            $this->commentService->createComment($comment);
 
         } catch (\Exception $e) {
             return ['success' => false, 'message' => $e->getMessage()];

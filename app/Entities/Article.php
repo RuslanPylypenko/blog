@@ -35,4 +35,9 @@ class Article extends Model
     {
         return '/storage/images/' . $this->image;
     }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class, 'article_id');
+    }
 }

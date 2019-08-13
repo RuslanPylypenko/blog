@@ -23,11 +23,28 @@ class ArticleRepository extends ARepository
     }
 
 
+    /**
+     * @param $id
+     * @return mixed
+     */
     public function findOne($id)
     {
         return $this->model->where('id', $id)->firstOrFail();
     }
 
+    /**
+     * @param $id
+     * @return mixed
+     */
+    public function findOneWithComments($id)
+    {
+        return $this->model->with(['comments'])->where('id', $id)->firstOrFail();
+    }
+
+    /**
+     * @param $id
+     * @return mixed
+     */
     public function delete($id)
     {
         return $this->model->where('id', $id)->delete();

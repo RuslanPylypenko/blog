@@ -39,7 +39,7 @@ class ArticlesController extends Controller
     public function show($id = null)
     {
         $this->service->addView($id);
-        $article = $this->service->getById($id);
+        $article = $this->service->getByIdWithComments($id);
 
         return view('articles/view', [
             'article' => $article

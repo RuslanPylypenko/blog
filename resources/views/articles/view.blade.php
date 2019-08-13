@@ -49,7 +49,22 @@
                 </div>
             </div>
         </div>
-    </div>
+
+        @if(!empty($comments))
+            <hr>
+
+            <div class="card">
+                <div class="card-header"><h2>Комментарии:</h2></div>
+                <div class="card-body">
+                    @foreach($article->comments as $comment)
+                        <div class="alert alert-secondary">
+                            <strong>{{$comment->user_id}}</strong> {{$comment->text}}
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        @endif
 
     </div>
+
 @endsection
