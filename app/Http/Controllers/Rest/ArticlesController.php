@@ -11,6 +11,7 @@ use App\Http\Requests\UpdateArticlePost;
 use App\Services\ArticleService;
 use App\Services\CommentService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ArticlesController extends Controller
 {
@@ -139,12 +140,11 @@ class ArticlesController extends Controller
 
     public function createComment($article_id, CreateComment $request)
     {
+        $User = Auth::guard()->user();
         try {
-
-
             $comment = [
                 'text' => $request->input('text'),
-                'user_id' => $request->input('user_id'),
+                'user_id' => $User->id,
                 'article_id' => $article_id
             ];
 

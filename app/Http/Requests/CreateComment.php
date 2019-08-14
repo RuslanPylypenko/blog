@@ -25,7 +25,6 @@ class CreateComment extends FormRequest
     {
         return [
             'text' => 'required|min:5',
-            'user_id' => 'required',
         ];
     }
 }

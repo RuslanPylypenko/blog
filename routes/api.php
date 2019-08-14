@@ -17,15 +17,11 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-#test
-
-Route::get('/test', function (Request $request){
-
-})->middleware('api.auth');
 
 #user
 
 Route::post('/user/register', 'Auth\ApiRegisterController@register')->name('user.register');
+Route::post('/user/login', 'Auth\ApiAuthController@login')->name('user.login');
 
 
 #articles
@@ -47,4 +43,7 @@ Route::post('/articles/update/{id}', 'Rest\ArticlesController@update')->name('ar
 
 #Comments
 
-Route::post('/articles/{article_id}/comment/create', 'Rest\ArticlesController@createComment')->name('comment.create');
+#Comments
+
+Route::post('/articles/{article_id}/comment/create', 'Rest\ArticlesController@createComment')
+    ->middleware('api.auth')->name('comment.create');
