@@ -4,6 +4,7 @@
 namespace App\Http\Controllers\Rest;
 
 
+use App\Exceptions\CommentException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CreateComment;
 use App\Http\Requests\StoreArticlePost;
@@ -12,6 +13,8 @@ use App\Services\ArticleService;
 use App\Services\CommentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 class ArticlesController extends Controller
 {
@@ -140,11 +143,11 @@ class ArticlesController extends Controller
 
     public function createComment($article_id, CreateComment $request)
     {
-        $User = Auth::guard()->user();
+
         try {
             $comment = [
                 'text' => $request->input('text'),
-                'user_id' => $User->id,
+                'user_id' => Auth::guard()->user()->id,
                 'article_id' => $article_id
             ];
 
@@ -158,6 +161,27 @@ class ArticlesController extends Controller
         return [
             'success' => true,
             'article' => $article
+        ];
+    }
+
+    public function deleteComment($comment_id)
+    {
+        try {
+            Validator::make(['comment_id' => $comment_id], [
+                'comment_id' => 'required|integer',
+            ])->validate();
+
+            $this->commentService->delete($comment_id, Auth::guard()->user()->id);
+        } catch (ValidationException $e) {
+            return ['success' => false, 'message' => $e->errors()];
+        } catch (CommentException $e) {
+            return ['success' => false, 'message' => $e->getMessage()];
+        } catch (\Exception $e) {
+            return ['success' => false, 'message' => $e->getMessage()];
+        }
+
+        return [
+            'success' => true,
         ];
     }
 }

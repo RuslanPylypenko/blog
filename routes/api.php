@@ -20,30 +20,31 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 #user
 
-Route::post('/user/register', 'Auth\ApiRegisterController@register')->name('user.register');
-Route::post('/user/login', 'Auth\ApiAuthController@login')->name('user.login');
+Route::post('user/register', 'Auth\ApiRegisterController@register')->name('user.register');
+Route::post('user/login', 'Auth\ApiAuthController@login')->name('user.login');
 
 
 #articles
 
-Route::resource('/articles', 'Rest\ArticlesController')->only([
+Route::resource('articles', 'Rest\ArticlesController')->only([
     'index', 'show'
 ]);
 
-Route::post('/articles/like/{id}', 'Rest\ArticlesController@like')->name('articles.like');
+Route::post('articles/like/{id}', 'Rest\ArticlesController@like')->name('articles.like');
 
-Route::post('/articles/create', 'Rest\ArticlesController@create')->name('articles.create');
+Route::post('articles/create', 'Rest\ArticlesController@create')->name('articles.create');
 
-Route::delete('/articles/{id}', 'Rest\ArticlesController@delete')->name('articles.delete');
+Route::delete('articles/{id}', 'Rest\ArticlesController@delete')->name('articles.delete');
 
-Route::patch('/articles/disable/{id}', 'Rest\ArticlesController@disableArticle')->name('articles.disable');
+Route::patch('articles/disable/{id}', 'Rest\ArticlesController@disableArticle')->name('articles.disable');
 
-Route::post('/articles/update/{id}', 'Rest\ArticlesController@update')->name('articles.update');
+Route::post('articles/update/{id}', 'Rest\ArticlesController@update')->name('articles.update');
 
-
-#Comments
 
 #Comments
 
-Route::post('/articles/{article_id}/comment/create', 'Rest\ArticlesController@createComment')
+Route::post('articles/{article_id}/comment/create', 'Rest\ArticlesController@createComment')
     ->middleware('api.auth')->name('comment.create');
+
+Route::delete('comment/{comment_id}/delete', 'Rest\ArticlesController@deleteComment')
+    ->middleware('api.auth')->name('comment.delete');

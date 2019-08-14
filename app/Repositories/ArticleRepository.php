@@ -38,7 +38,7 @@ class ArticleRepository extends ARepository
      */
     public function findOneWithComments($id)
     {
-        return $this->model->with(['comments'])->where('id', $id)->firstOrFail();
+        return $this->model->with(['comments', 'comments.user'])->where('id', $id)->firstOrFail();
     }
 
     /**
