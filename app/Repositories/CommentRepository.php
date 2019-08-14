@@ -28,11 +28,21 @@ class CommentRepository extends ARepository
             ->where('user_id', $user_id)->delete();
     }
 
+    /**
+     * @param $comment_id
+     * @return mixed
+     */
     public function isExist($comment_id)
     {
        return $this->exists(['id' => $comment_id]);
     }
 
+
+    /**
+     * @param $comment_id
+     * @param $user_id
+     * @return mixed
+     */
     public function hasAccess($comment_id, $user_id)
     {
        return $this->exists(['id' => $comment_id, 'user_id' => $user_id]);
