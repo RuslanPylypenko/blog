@@ -21,6 +21,6 @@ class Comment extends Model
 
     public function getUserName()
     {
-        return $this->user() ? $this->user()->name : 'Инкогнито';
+        return $this->user ? $this->user->name : 'Инкогнито';
     }
 }

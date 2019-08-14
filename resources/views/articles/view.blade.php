@@ -58,7 +58,7 @@
                 <div class="card-body">
                     @foreach($article->comments as $comment)
                         <div class="alert alert-secondary">
-                            <strong>{{$comment->user_id}}</strong> {{$comment->text}}
+                            <strong>{{$comment->getUserName()}} :</strong> {{$comment->text}}
                         </div>
                     @endforeach
                 </div>
