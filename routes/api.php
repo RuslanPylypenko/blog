@@ -24,6 +24,9 @@ Route::post('user/register', 'Auth\ApiRegisterController@register')->name('user.
 Route::post('user/login', 'Auth\ApiAuthController@login')->name('user.login');
 
 
+Route::post('user/{id}/send-points', 'Rest\UserController@sendPoints')
+    ->middleware('api.auth')->name('user.send-points');
+
 #articles
 
 Route::resource('articles', 'Rest\ArticlesController')->only([
