@@ -138,9 +138,7 @@ class ArticlesController extends Controller
             return ['success' => false, 'message' => $e->getMessage()];
         }
 
-        return [
-            'success' => true
-        ];
+        return ['success' => true];
     }
 
 

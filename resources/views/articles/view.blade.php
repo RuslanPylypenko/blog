@@ -13,7 +13,7 @@
             </div>
             <div class="card-body">
 
-                <img src="{{$article->getImage()}}"
+                <img src="{{$article->image}}"
                      class="img-thumbnail float-left"
                      alt="{{$article->title}}">
 

@@ -31,11 +31,6 @@ class Article extends Model
         return  $short_text;
     }
 
-    public function getImage()
-    {
-        return '/storage/images/' . $this->image;
-    }
-
     public function comments()
     {
         return $this->hasMany(Comment::class, 'article_id');

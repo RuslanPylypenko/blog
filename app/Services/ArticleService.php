@@ -81,7 +81,8 @@ class ArticleService
     {
         $faker = Faker::create();
 
-        $filepath = public_path('storage/images');
+        $image_folder = '/storage/images/';
+        $filepath = public_path($image_folder);
 
         if (!File::exists($filepath)) {
             File::makeDirectory($filepath);
@@ -89,7 +90,7 @@ class ArticleService
 
         $article['likes'] = 0;
         $article['views'] = 0;
-        $article['image'] = $faker->image($filepath, 400, 300, false, false);
+        $article['image'] = $image_folder . $faker->image($filepath, 400, 300, false, false);
 
         return $this->repository->create($article);
     }
@@ -109,9 +110,11 @@ class ArticleService
     /**
      * @param $id
      * @return mixed
+     * @throws \Exception
      */
     public function deleteArticle($id)
     {
+        throw new \Exception('У Вас нет прав удалить статью. Ни у кого нет прав удалить статью...');
         return $this->repository->delete($id);
     }
 

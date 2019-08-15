@@ -16,6 +16,7 @@ class ArticlesTableSeeder extends Seeder
     {
         $faker = Faker\Factory::create('Ru_RU');
 
+        $image_folder = '/storage/images/';
         $filepath = public_path('storage/images');
 
         if(!File::exists($filepath)){
@@ -28,7 +29,7 @@ class ArticlesTableSeeder extends Seeder
                 'text' => $faker->text(rand(1400, 2000)),
                 'views' => rand(0, 600),
                 'likes' => rand(0, 300),
-                'image' => $faker->image($filepath,400,300, false, false) ,
+                'image' => $image_folder . $faker->image($filepath,400,300, false, false) ,
                 'created_at' => $faker->date('Y-m-d H:i:s'),
                 'updated_at' => $faker->date('Y-m-d H:i:s'),
             ]);

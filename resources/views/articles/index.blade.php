@@ -37,7 +37,7 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-sm-2">
-                            <img src="{{$article->getImage()}}"
+                            <img src="{{$article->image}}"
                                  class="img-thumbnail"
                                  alt="{{$article->title}}">
                         </div>
