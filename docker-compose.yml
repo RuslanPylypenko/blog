@@ -18,6 +18,15 @@ services:
             - ./:/var/www
         links:
             - blog_database
+    redis:
+        image: redis
+        restart: always
+        volumes:
+        - ./data/redis/data:/data
+        ports:
+        - 6380:6379
+        logging:
+            driver: none
     blog_database:
         image: mysql:5.7
         container_name: blog_database

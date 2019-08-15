@@ -4,6 +4,9 @@
 namespace App\Repositories;
 
 
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Redis;
+
 class UserRepository extends ARepository
 {
 
@@ -31,5 +34,26 @@ class UserRepository extends ARepository
     public function findOrFail($id)
     {
         return $this->model->where('id', $id)->firstOrFail();
+    }
+
+
+    /**
+     * @param $follower_id
+     * @param $subscriber_id
+     */
+    public function setSubscriber($follower_id, $subscriber_id)
+    {
+        Redis::set("user:{$follower_id}:followers", $subscriber_id);
+        Redis::set("user:{$subscriber_id}:subscribers", $follower_id);
+    }
+
+    /**
+     * @param $follower_id
+     * @param $subscriber_id
+     */
+    public function unsetSubscriber($follower_id, $subscriber_id)
+    {
+        Redis::del("user:{$follower_id}:followers", $subscriber_id);
+        Redis::del("user:{$subscriber_id}:subscribers", $follower_id);
     }
 }

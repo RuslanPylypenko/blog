@@ -13,10 +13,6 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
-
 
 #user
 
@@ -28,6 +24,12 @@ Route::get('users', 'Rest\UserController@index')->name('users.list');
 
 Route::post('users/{id}/send-points', 'Rest\UserController@sendPoints')
     ->middleware('api.auth')->name('users.send-points');
+
+Route::post('users/{id}/subscribe', 'Rest\UserController@subscribe')
+    ->middleware('api.auth')->name('users.subscribe');
+
+Route::post('users/{id}/unsubscribe', 'Rest\UserController@unsubscribe')
+    ->middleware('api.auth')->name('users.unsubscribe');
 
 #articles
 

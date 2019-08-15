@@ -71,15 +71,8 @@ class PointService
      * @param $data
      * @throws \Exception
      */
-    public function sendPointTransaction($user_id, $data)
+    public function sendPointTransaction(User $user, User $cUser, $data)
     {
-
-        $cUser = Auth::guard()->user();
-
-        $user = $this->userRepository->find($user_id);
-
-        if(!$user)  throw new \Exception('Нет такого пользователя!');
-
         if ($this->isAvailablePoints($cUser, $data['points'])) {
             try {
                 DB::beginTransaction();
