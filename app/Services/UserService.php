@@ -62,7 +62,6 @@ class UserService
     public function subscribe(User $user, User $cUser)
     {
         if ($this->isUserEquivalent($user, $cUser)) throw new \Exception('Невозможно подписаться на себя!');
-        if (!$user) throw new \Exception('Нет такого пользователя!');
 
         return $this->subscribeRepository->setSubscriber($user->id, $cUser->id);
     }
@@ -77,6 +76,36 @@ class UserService
         if (!$user) throw new \Exception('Нет такого пользователя!');
 
         return $this->subscribeRepository->unsetSubscriber($user->id, $cUser->id);
+    }
+
+
+    /**
+     * @param User $user
+     * @return array
+     * @throws \Exception
+     */
+    public function getSubscribers(User $user)
+    {
+        if (!$user) throw new \Exception('Нет такого пользователя!');
+
+        $user_ids = $this->subscribeRepository->getSubscribers($user->id);
+
+        return $this->userRepository->getByUserIds($user_ids);
+    }
+
+
+    /**
+     * @param User $user
+     * @return array
+     * @throws \Exception
+     */
+    public function getFollowers(User $user)
+    {
+        if (!$user) throw new \Exception('Нет такого пользователя!');
+
+        $user_ids = $this->subscribeRepository->getFollowers($user->id);
+
+        return $this->userRepository->getByUserIds($user_ids);
     }
 
 

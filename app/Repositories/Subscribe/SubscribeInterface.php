@@ -19,4 +19,15 @@ interface SubscribeInterface
      */
     public function unsetSubscriber($follower_id, $subscriber_id);
 
+    /**
+     * @param $user_id
+     * @return array
+     */
+    public function getSubscribers($user_id);
+
+    /**
+     * @param $user_id
+     * @return mixed
+     */
+    public function getFollowers($user_id);
 }

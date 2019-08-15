@@ -16,6 +16,16 @@ class UserRepository extends ARepository
     }
 
     /**
+     * @param $user_ids
+     * @return array
+     */
+    public function getByUserIds($user_ids)
+    {
+        return $this->model->select(['id', 'name', 'email'])
+            ->whereIn('id', $user_ids)->get();
+    }
+
+    /**
      * @param $id
      * @return mixed
      */

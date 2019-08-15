@@ -7,7 +7,6 @@ namespace App\Http\Controllers\Rest;
 use App\Http\Controllers\Controller;
 use App\Services\PointService;
 use App\Services\UserService;
-use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -93,6 +92,8 @@ class UserController extends Controller
             $cUser = Auth::guard()->user();
             $user = $this->userService->find($user_id);
 
+            if (!$user) throw new \Exception('Нет такого пользователя!');
+
             $this->userService->subscribe($user, $cUser);
             return ['success' => true, 'message' => 'OK'];
         } catch (\Exception $e) {
@@ -118,7 +119,43 @@ class UserController extends Controller
         } catch (\Exception $e) {
             return ['success' => false, 'message' => $e->getMessage()];
         }
+    }
 
+    /**
+     * @param $user_id
+     * @return array
+     */
+    public function getSubscribers($user_id)
+    {
+        try {
+            $user = $this->userService->find($user_id);
+
+            if (!$user) throw new \Exception('Нет такого пользователя!');
+
+            $users = $this->userService->getSubscribers($user);
+            return ['success' => true, 'users' => $users];
+        } catch (\Exception $e) {
+            return ['success' => false, 'message' => $e->getMessage()];
+        }
+    }
+
+
+    /**
+     * @param $user_id
+     * @return array
+     */
+    public function getFollowers($user_id)
+    {
+        try {
+            $user = $this->userService->find($user_id);
+
+            if (!$user) throw new \Exception('Нет такого пользователя!');
+
+            $users = $this->userService->getFollowers($user);
+            return ['success' => true, 'users' => $users];
+        } catch (\Exception $e) {
+            return ['success' => false, 'message' => $e->getMessage()];
+        }
     }
 
     /**

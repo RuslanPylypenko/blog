@@ -31,6 +31,12 @@ Route::post('users/{id}/subscribe', 'Rest\UserController@subscribe')
 Route::post('users/{id}/unsubscribe', 'Rest\UserController@unsubscribe')
     ->middleware('api.auth')->name('users.unsubscribe');
 
+Route::get('users/{id}/subscribers', 'Rest\UserController@getSubscribers')
+    ->name('users.subscribers.show');
+
+Route::get('users/{id}/followers', 'Rest\UserController@getFollowers')
+    ->name('users.followers.show');
+
 #articles
 
 Route::resource('articles', 'Rest\ArticlesController')->only([

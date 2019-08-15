@@ -15,8 +15,8 @@ class RedisSubscribeRepository implements SubscribeInterface
      */
     public function setSubscriber($follower_id, $subscriber_id)
     {
-        Redis::set("user:{$follower_id}:followers", $subscriber_id);
-        Redis::set("user:{$subscriber_id}:subscribers", $follower_id);
+        Redis::sadd("user:{$follower_id}:followers", $subscriber_id);
+        Redis::sadd("user:{$subscriber_id}:subscribers", $follower_id);
     }
 
     /**
@@ -25,7 +25,25 @@ class RedisSubscribeRepository implements SubscribeInterface
      */
     public function unsetSubscriber($follower_id, $subscriber_id)
     {
-        Redis::del("user:{$follower_id}:followers", $subscriber_id);
-        Redis::del("user:{$subscriber_id}:subscribers", $follower_id);
+        Redis::srem("user:{$follower_id}:followers", $subscriber_id);
+        Redis::srem("user:{$subscriber_id}:subscribers", $follower_id);
+    }
+
+    /**
+     * @param $user_id
+     * @return array
+     */
+   public function getSubscribers($user_id)
+   {
+      return Redis::smembers("user:{$user_id}:subscribers");
+   }
+
+    /**
+     * @param $user_id
+     * @return array
+     */
+    public function getFollowers($user_id)
+    {
+        return Redis::smembers("user:{$user_id}:followers");
     }
 }
