@@ -8,6 +8,7 @@ use App\Entities\PointsTransaction;
 use App\Repositories\ArticleRepository;
 use App\Repositories\CommentRepository;
 use App\Repositories\PointsRepository;
+use App\Repositories\Subscribe\RedisSubscribeRepository;
 use App\Repositories\UserRepository;
 use App\Services\ArticleService;
 use App\Services\CommentService;
@@ -34,15 +35,18 @@ class AppServiceProvider extends ServiceProvider
             return new CommentService(new CommentRepository(new Comment()));
         });
 
-        $this->app->bind(PointService::class, function (){
+        $this->app->bind(PointService::class, function () {
             return new PointService(
                 new PointsRepository(new PointsTransaction()),
                 new UserRepository(new User())
             );
         });
 
-        $this->app->bind(UserService::class, function (){
-            return new UserService(new UserRepository(new User()));
+        $this->app->bind(UserService::class, function () {
+            return new UserService(
+                new UserRepository(new User()),
+                new RedisSubscribeRepository()
+            );
         });
     }
 

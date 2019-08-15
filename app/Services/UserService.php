@@ -4,6 +4,7 @@
 namespace App\Services;
 
 
+use App\Repositories\Subscribe\SubscribeInterface;
 use App\Repositories\UserRepository;
 use App\User;
 
@@ -15,14 +16,24 @@ class UserService
      */
     private $userRepository;
 
+    /**
+     * @var SubscribeInterface
+     */
+    private $subscribeRepository;
+
 
     /**
      * UserService constructor.
      * @param UserRepository $userRepository
+     * @param SubscribeInterface $subscribeRepository
      */
-    public function __construct(UserRepository $userRepository)
+    public function __construct(
+        UserRepository $userRepository,
+        SubscribeInterface $subscribeRepository
+    )
     {
         $this->userRepository = $userRepository;
+        $this->subscribeRepository = $subscribeRepository;
     }
 
     /**
@@ -53,7 +64,7 @@ class UserService
         if ($this->isUserEquivalent($user, $cUser)) throw new \Exception('Невозможно подписаться на себя!');
         if (!$user) throw new \Exception('Нет такого пользователя!');
 
-        return $this->userRepository->setSubscriber($user->id, $cUser->id);
+        return $this->subscribeRepository->setSubscriber($user->id, $cUser->id);
     }
 
     /**
@@ -65,7 +76,7 @@ class UserService
     {
         if (!$user) throw new \Exception('Нет такого пользователя!');
 
-        return $this->userRepository->unsetSubscriber($user->id, $cUser->id);
+        return $this->subscribeRepository->unsetSubscriber($user->id, $cUser->id);
     }
 
 
