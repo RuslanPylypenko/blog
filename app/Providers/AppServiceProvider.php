@@ -12,6 +12,7 @@ use App\Repositories\UserRepository;
 use App\Services\ArticleService;
 use App\Services\CommentService;
 use App\Services\PointService;
+use App\Services\UserService;
 use App\User;
 use Illuminate\Support\ServiceProvider;
 
@@ -38,6 +39,10 @@ class AppServiceProvider extends ServiceProvider
                 new PointsRepository(new PointsTransaction()),
                 new UserRepository(new User())
             );
+        });
+
+        $this->app->bind(UserService::class, function (){
+            return new UserService(new UserRepository(new User()));
         });
     }
 

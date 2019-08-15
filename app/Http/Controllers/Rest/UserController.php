@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Rest;
 
 use App\Http\Controllers\Controller;
 use App\Services\PointService;
+use App\Services\UserService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -16,14 +17,33 @@ class UserController extends Controller
      */
     private $pointService;
 
+    /**
+     * @var UserService
+     */
+    private $userService;
 
     /**
      * UserController constructor.
      * @param PointService $pointService
+     * @param UserService $userService
      */
-    public function __construct(PointService $pointService)
+    public function __construct(
+        PointService $pointService,
+        UserService $userService
+    )
     {
+        $this->userService = $userService;
         $this->pointService = $pointService;
+    }
+
+    public function index()
+    {
+        $users = $this->userService->get();
+
+        return [
+            'success' => true,
+            'users' => $users
+        ];
     }
 
 

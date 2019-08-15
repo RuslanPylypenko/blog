@@ -20,12 +20,14 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 #user
 
-Route::post('user/register', 'Auth\ApiRegisterController@register')->name('user.register');
-Route::post('user/login', 'Auth\ApiAuthController@login')->name('user.login');
+Route::post('users/register', 'Auth\ApiRegisterController@register')->name('users.register');
+Route::post('users/login', 'Auth\ApiAuthController@login')->name('users.login');
 
 
-Route::post('user/{id}/send-points', 'Rest\UserController@sendPoints')
-    ->middleware('api.auth')->name('user.send-points');
+Route::get('users', 'Rest\UserController@index')->name('users.list');
+
+Route::post('users/{id}/send-points', 'Rest\UserController@sendPoints')
+    ->middleware('api.auth')->name('users.send-points');
 
 #articles
 
