@@ -44,22 +44,38 @@ class UserService
     }
 
     /**
-     * @param User $User
+     * @param User $user
      * @param User $cUser
-     * @return mixed
+     * @throws \Exception
      */
-    public function subscribe(User $User, User $cUser)
+    public function subscribe(User $user, User $cUser)
     {
-        return $this->userRepository->setSubscriber($User->id, $cUser->id);
+        if ($this->isUserEquivalent($user, $cUser)) throw new \Exception('Невозможно подписаться на себя!');
+        if (!$user) throw new \Exception('Нет такого пользователя!');
+
+        return $this->userRepository->setSubscriber($user->id, $cUser->id);
     }
 
     /**
-     * @param User $User
+     * @param User $user
      * @param User $cUser
-     * @return mixed
+     * @throws \Exception
      */
-    public function unsubscribe(User $User, User $cUser)
+    public function unsubscribe(User $user, User $cUser)
     {
-        return $this->userRepository->unsetSubscriber($User->id, $cUser->id);
+        if (!$user) throw new \Exception('Нет такого пользователя!');
+
+        return $this->userRepository->unsetSubscriber($user->id, $cUser->id);
+    }
+
+
+    /**
+     * @param User $user
+     * @param User $cUser
+     * @return bool
+     */
+    private function isUserEquivalent(User $user, User $cUser)
+    {
+        return $cUser->id === $user->id;
     }
 }

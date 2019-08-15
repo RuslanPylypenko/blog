@@ -31,6 +31,11 @@ class ArticlesController extends Controller
     private $commentService;
 
 
+    /**
+     * ArticlesController constructor.
+     * @param ArticleService $articleService
+     * @param CommentService $commentService
+     */
     public function __construct(
         ArticleService $articleService,
         CommentService $commentService
@@ -40,6 +45,10 @@ class ArticlesController extends Controller
         $this->commentService = $commentService;
     }
 
+    /**
+     * @param Request $request
+     * @return array|mixed
+     */
     public function index(Request $request)
     {
         try {
@@ -54,6 +63,10 @@ class ArticlesController extends Controller
         return $articles;
     }
 
+    /**
+     * @param null $id
+     * @return array|mixed
+     */
     public function show($id = null)
     {
         try {
@@ -65,6 +78,11 @@ class ArticlesController extends Controller
         return $article;
     }
 
+
+    /**
+     * @param StoreArticlePost $articlePost
+     * @return array|mixed
+     */
     public function create(StoreArticlePost $articlePost)
     {
         try {
@@ -80,6 +98,11 @@ class ArticlesController extends Controller
     }
 
 
+    /**
+     * @param $id
+     * @param UpdateArticlePost $articlePost
+     * @return array
+     */
     public function update($id, UpdateArticlePost $articlePost)
     {
 
@@ -102,6 +125,11 @@ class ArticlesController extends Controller
         return ['success' => true, 'article' => $article];
     }
 
+
+    /**
+     * @param $id
+     * @return array
+     */
     public function delete($id)
     {
         try {
@@ -116,6 +144,10 @@ class ArticlesController extends Controller
     }
 
 
+    /**
+     * @param null $id
+     * @return array|mixed
+     */
     public function like($id = null)
     {
         try {
@@ -128,6 +160,10 @@ class ArticlesController extends Controller
     }
 
 
+    /**
+     * @param null $id
+     * @return array
+     */
     public function disableArticle($id = null)
     {
         try {
@@ -141,9 +177,14 @@ class ArticlesController extends Controller
         ];
     }
 
+
+    /**
+     * @param $article_id
+     * @param CreateComment $request
+     * @return array
+     */
     public function createComment($article_id, CreateComment $request)
     {
-
         try {
             $comment = [
                 'text' => $request->input('text'),
@@ -164,6 +205,11 @@ class ArticlesController extends Controller
         ];
     }
 
+
+    /**
+     * @param $comment_id
+     * @return array
+     */
     public function deleteComment($comment_id)
     {
         try {

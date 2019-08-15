@@ -17,11 +17,19 @@ class ArticlesController extends Controller
     private $service;
 
 
+    /**
+     * ArticlesController constructor.
+     * @param ArticleService $service
+     */
     public function __construct(ArticleService $service)
     {
         $this->service = $service;
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function index(Request $request)
     {
         $sort = $request->input('sort', 'created_at');
@@ -36,6 +44,10 @@ class ArticlesController extends Controller
         ]);
     }
 
+    /**
+     * @param null $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function show($id = null)
     {
         $this->service->addView($id);
@@ -46,6 +58,10 @@ class ArticlesController extends Controller
         ]);
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function like(Request $request)
     {
         $articleId = $request->input('article');

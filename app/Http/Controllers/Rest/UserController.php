@@ -38,9 +38,13 @@ class UserController extends Controller
         $this->pointService = $pointService;
     }
 
+    /**
+     * Показать список пользователей
+     * @return array
+     */
     public function index()
     {
-        $users = $this->userService->get();
+        $users = $this->userService->get(); // todo реализовать пагинацию
 
         return [
             'success' => true,
@@ -49,6 +53,12 @@ class UserController extends Controller
     }
 
 
+    /**
+     * Отправить очки пользователю
+     * @param $user_id
+     * @param Request $request
+     * @return array
+     */
     public function sendPoints($user_id, Request $request)
     {
         $data = [
@@ -72,14 +82,16 @@ class UserController extends Controller
 
     }
 
+    /**
+     * Подписаться на пользователя
+     * @param $user_id
+     * @return array
+     */
     public function subscribe($user_id)
     {
         try {
             $cUser = Auth::guard()->user();
             $user = $this->userService->find($user_id);
-
-            if ($this->isUserEquivalent($user, $cUser)) throw new \Exception('Невозможно подписаться на себя!');
-            if (!$user) throw new \Exception('Нет такого пользователя!');
 
             $this->userService->subscribe($user, $cUser);
             return ['success' => true, 'message' => 'OK'];
@@ -90,13 +102,16 @@ class UserController extends Controller
     }
 
 
+    /**
+     * Отписаться от пользователя
+     * @param $user_id
+     * @return array
+     */
     public function unsubscribe($user_id)
     {
         try {
             $cUser = Auth::guard()->user();
             $user = $this->userService->find($user_id);
-
-            if (!$user) throw new \Exception('Нет такого пользователя!');
 
             $this->userService->unsubscribe($user, $cUser);
             return ['success' => true, 'message' => 'OK'];
@@ -106,11 +121,10 @@ class UserController extends Controller
 
     }
 
-    private function isUserEquivalent(User $user, User $cUser)
-    {
-        return $cUser->id === $user->id;
-    }
-
+    /**
+     * Валидация отправки монет
+     * @param $data
+     */
     private function sentPointsValidate($data)
     {
         Validator::make(
