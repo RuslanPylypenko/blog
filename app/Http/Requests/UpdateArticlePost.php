@@ -26,7 +26,8 @@ class UpdateArticlePost extends FormRequest
         return [
             'title' => 'max:255',
             'text' => 'min:20',
-            'image' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048'
+            'image' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'price' => 'integer|min:0'
         ];
     }
 }

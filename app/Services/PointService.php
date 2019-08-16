@@ -57,7 +57,7 @@ class PointService
                     'points_after_transaction' => $user->points
                 ]);
 
-                DB::rollBack();
+                DB::commit();
 
             } catch (\Exception $e) {
                 DB::rollBack();

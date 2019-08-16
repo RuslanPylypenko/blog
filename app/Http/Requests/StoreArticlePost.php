@@ -24,8 +24,9 @@ class StoreArticlePost extends FormRequest
     public function rules()
     {
         return [
-            'title' => 'required|max:255',
-            'text' => 'required|min:20',
+            'title' => 'required|string|max:255',
+            'text' => 'required|string|min:20',
+            'price' => 'required|integer|min:0',
             'image' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048'
         ];
     }

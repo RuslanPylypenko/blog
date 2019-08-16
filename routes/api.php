@@ -43,15 +43,24 @@ Route::resource('articles', 'Rest\ArticlesController')->only([
     'index', 'show'
 ]);
 
-Route::post('articles/like/{id}', 'Rest\ArticlesController@like')->name('articles.like');
 
-Route::post('articles/create', 'Rest\ArticlesController@create')->name('articles.create');
+Route::post('articles/create', 'Rest\ArticlesController@create')
+    ->middleware('api.auth')->name('articles.create');
+
+Route::post('articles/{id}/like', 'Rest\ArticlesController@like')
+    ->middleware('api.auth')->name('articles.like');
+
+
 
 Route::delete('articles/{id}', 'Rest\ArticlesController@delete')->name('articles.delete');
 
-Route::patch('articles/disable/{id}', 'Rest\ArticlesController@disableArticle')->name('articles.disable');
+Route::patch('articles/{id}/disable', 'Rest\ArticlesController@disableArticle')
+    ->middleware('api.auth')->name('articles.update');
 
-Route::post('articles/update/{id}', 'Rest\ArticlesController@update')->name('articles.update');
+Route::post('articles/{id}/update', 'Rest\ArticlesController@update')
+    ->middleware('api.auth')->name('articles.update');
+
+Route::match(['get', 'post'], 'articles/{id}/buy', 'Rest\ArticlesController@buy')->name('articles.buy');
 
 
 #Comments

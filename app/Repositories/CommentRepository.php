@@ -17,15 +17,14 @@ class CommentRepository extends ARepository
             ->get();
     }
 
+
     /**
      * @param $comment_id
-     * @param $user_id
      * @return mixed
      */
-    public function delete($comment_id, $user_id)
+    public function delete($comment_id)
     {
-        return $this->model->where('id', $comment_id)
-            ->where('user_id', $user_id)->delete();
+        return $this->model->where('id', $comment_id)->delete();
     }
 
     /**

@@ -4,8 +4,11 @@
 namespace App\Services;
 
 
+use App\Decorators\ArticleFullTextDecorator;
 use App\Entities\Article;
+use App\Helpers\StringHelper;
 use App\Repositories\ArticleRepository;
+use App\User;
 use Faker\Factory as Faker;
 use Illuminate\Support\Facades\File;
 
@@ -17,28 +20,38 @@ class ArticleService
      */
     private $repository;
 
+    /**
+     * ArticleService constructor.
+     * @param ArticleRepository $repository
+     */
     public function __construct(ArticleRepository $repository)
     {
         $this->repository = $repository;
     }
 
-    /**
-     * @param $id
-     * @return mixed
-     */
-    public function getById($id)
+
+    public function showArticle($articleId, $cUser)
     {
-        return $this->repository->findOne($id);
+        $article = $this->find($articleId);
+
+        if ($article->price > 0) {
+            $decorator = new ArticleFullTextDecorator($article);
+            $article = $decorator->decorate();
+        }
+
+        return $article;
     }
 
+
     /**
-     * @param $id
+     * @param $articleId
      * @return mixed
      */
-    public function getByIdWithComments($id)
+    public function find($articleId)
     {
-        return $this->repository->findOneWithComments($id);
+        return $this->repository->find($articleId);
     }
+
 
     /**
      * @param int $perPage
@@ -57,7 +70,7 @@ class ArticleService
      */
     public function addView($id)
     {
-        $article = $this->repository->findOne($id);
+        $article = $this->repository->findOne(['id' => $id]);
         return $this->repository->update($id, ['views' => ($article->views + 1)]);
     }
 
@@ -68,7 +81,7 @@ class ArticleService
      */
     public function likeArticle($id)
     {
-        $article = $this->repository->findOne($id);
+        $article = $this->repository->findOne(['id' => $id]);
         return $this->repository->update($id, ['likes' => ($article->likes + 1)]);
     }
 
@@ -88,9 +101,12 @@ class ArticleService
             File::makeDirectory($filepath);
         }
 
+        $image = $image_folder . $faker->image($filepath, 400, 300, false, false);
+
         $article['likes'] = 0;
         $article['views'] = 0;
-        $article['image'] = $image_folder . $faker->image($filepath, 400, 300, false, false);
+        $article['image'] = $image;
+        $article['short_text'] = StringHelper::getHortText($article['text'], Article::SHORT_TEXT_LENGTH);
 
         return $this->repository->create($article);
     }
@@ -105,6 +121,29 @@ class ArticleService
     {
         return $this->repository->update($id, $article);
     }
+
+
+    /**
+     * @param User $user
+     * @param $articleId
+     * @return bool
+     */
+    public function hasUserAccessToArticle(User $user, $articleId)
+    {
+        return $this->repository->exists(['id' => $articleId, 'user_id' => $user->id]);
+    }
+
+
+    /**
+     * @param User $user
+     * @param $articleId
+     * @return bool
+     */
+    public function hasUserCommentArticle(User $user, $articleId)
+    {
+        return $this->repository->exists(['id' => $articleId, 'status' => 1]);
+    }
+
 
 
     /**

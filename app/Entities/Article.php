@@ -4,6 +4,7 @@
 namespace App\Entities;
 
 
+use App\User;
 use Illuminate\Database\Eloquent\Model;
 
 class Article extends Model
@@ -15,7 +16,7 @@ class Article extends Model
 
     protected $table = 'articles';
 
-    protected $fillable = ['title', 'text', 'views', 'likes', 'image', 'status'];
+    protected $fillable = ['title', 'text', 'views', 'likes', 'image', 'status', 'short_text', 'price', 'user_id'];
 
 
     public function getShortText()
@@ -29,6 +30,11 @@ class Article extends Model
         }
 
         return  $short_text;
+    }
+
+    public function user()
+    {
+        return $this->hasOne(User::class, 'id')->select(['id', 'name', 'email']);
     }
 
     public function comments()

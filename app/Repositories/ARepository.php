@@ -43,6 +43,15 @@ abstract class ARepository
         return $this->model->where($criteria)->exists();
     }
 
+    /**
+     * @param array $criteria
+     * @return mixed
+     */
+    public function findOne(array $criteria)
+    {
+        return $this->model->where($criteria)->first();
+    }
+
 
     /**
      * @param $id

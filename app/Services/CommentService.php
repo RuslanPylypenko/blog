@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Exceptions\CommentException;
 use App\Repositories\CommentRepository;
+use App\User;
 
 class CommentService
 {
@@ -19,10 +20,11 @@ class CommentService
     }
 
     /**
+     * @param User $cUser
      * @param array $comment
      * @return mixed
      */
-    public function createComment(array $comment)
+    public function createComment(User $cUser, array $comment)
     {
         return $this->repository->create($comment);
     }
@@ -37,19 +39,23 @@ class CommentService
     }
 
     /**
+     * @param User $user
+     * @param $comment_id
+     * @return bool
+     */
+    public function hasUserAccessComment(User $user, $comment_id)
+    {
+        return $this->repository->exists(['id' => $comment_id, 'user_id' => $user->id]);
+    }
+
+
+    /**
      * @param $comment_id
      * @param $user_id
      * @return mixed
-     * @throws CommentException
      */
-    public function delete($comment_id, $user_id)
+    public function delete($comment_id)
     {
-        if ($this->repository->isExist($comment_id)) {
-            if (!$this->repository->hasAccess($comment_id, $user_id)) {
-                throw new CommentException('Это не Ваш комментарий');
-            }
-            return $this->repository->delete($comment_id, $user_id);
-        }
-        throw new CommentException('Комментарий не найден');
+        return $this->repository->delete($comment_id);
     }
 }

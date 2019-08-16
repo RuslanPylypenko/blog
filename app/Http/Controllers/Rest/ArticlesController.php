@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpFoundation\Response;
 
 class ArticlesController extends Controller
 {
@@ -70,7 +71,8 @@ class ArticlesController extends Controller
     public function show($id = null)
     {
         try {
-            $article = $this->articleService->getByIdWithComments($id);
+            $cUser = Auth::guard()->user();
+            $article = $this->articleService->showArticle($id, $cUser);
             $this->articleService->addView($id);
         } catch (\Exception $e) {
             return ['success' => false, 'message' => $e->getMessage()];
@@ -86,15 +88,19 @@ class ArticlesController extends Controller
     public function create(StoreArticlePost $articlePost)
     {
         try {
-            $article = [
+            $data = [
                 'title' => $articlePost->input('title'),
                 'text' => $articlePost->input('text'),
+                'price' => $articlePost->input('price'),
+                'user_id' => Auth::guard()->user()->id,
             ];
+            $article = $this->articleService->createArticle($data);
+            return ['success' => true, 'message' => $article];
         } catch (\Exception $e) {
             return ['success' => false, 'message' => $e->getMessage()];
         }
 
-        return $this->articleService->createArticle($article);
+
     }
 
 
@@ -105,24 +111,30 @@ class ArticlesController extends Controller
      */
     public function update($id, UpdateArticlePost $articlePost)
     {
-
         try {
-            $article = [
-                'title' => $articlePost->input('title'),
-                'text' => $articlePost->input('text'),
-            ];
 
-            foreach ($article as $item => &$value) {
-                if (!$article[$item]) unset($article[$item]);
+            $cUser = Auth::guard()->user();
+            if(!$this->articleService->hasUserAccessToArticle($cUser, $id)){
+                throw new \Exception('Вы не можете удалять статью...');
             }
 
-            $this->articleService->updateArticle($id, $article);
-            $article = $this->articleService->getById($id);
+            $data = [
+                'title' => $articlePost->input('title'),
+                'text' => $articlePost->input('text'),
+                'price' => $articlePost->input('price'),
+            ];
+
+            foreach ($data as $item => &$value) {
+                if (!$data[$item]) unset($data[$item]);
+            }
+
+            $this->articleService->updateArticle($id, $data);
+
+            $article = $this->articleService->find($id);
+            return ['success' => true, 'article' => $article];
         } catch (\Exception $e) {
             return ['success' => false, 'message' => $e->getMessage()];
         }
-
-        return ['success' => true, 'article' => $article];
     }
 
 
@@ -133,6 +145,10 @@ class ArticlesController extends Controller
     public function delete($id)
     {
         try {
+            $cUser = Auth::guard()->user();
+            if(!$this->articleService->hasUserAccessToArticle($cUser, $id)){
+                throw new \Exception('Вы не можете удалять статью...');
+            }
             $this->articleService->deleteArticle($id);
         } catch (\Exception $e) {
             return ['success' => false, 'message' => $e->getMessage()];
@@ -149,7 +165,8 @@ class ArticlesController extends Controller
     public function like($id = null)
     {
         try {
-            $article = $this->articleService->getById($id);
+
+            $article = $this->articleService->find($id);
             $this->articleService->likeArticle($id);
         } catch (\Exception $e) {
             return ['success' => false, 'message' => $e->getMessage()];
@@ -165,6 +182,10 @@ class ArticlesController extends Controller
     public function disableArticle($id = null)
     {
         try {
+            $cUser = Auth::guard()->user();
+            if(!$this->articleService->hasUserAccessToArticle($cUser, $id)){
+                throw new \Exception('Вы не можете скрыть статью...');
+            }
             $this->articleService->disableArticle($id);
         } catch (\Exception $e) {
             return ['success' => false, 'message' => $e->getMessage()];
@@ -184,23 +205,27 @@ class ArticlesController extends Controller
     public function createComment($article_id, CreateComment $request)
     {
         try {
+
+            $cUser = Auth::guard()->user();
+
+            if(!$this->articleService->hasUserCommentArticle($cUser, $article_id)){
+                throw new \Exception('Невозможно добавить комментарий...');
+            }
+
             $comment = [
                 'text' => $request->input('text'),
-                'user_id' => Auth::guard()->user()->id,
+                'user_id' => $cUser->id,
                 'article_id' => $article_id
             ];
 
-            $this->commentService->createComment($comment);
+            $this->commentService->createComment($cUser, $comment);
 
-            $article = $this->articleService->getByIdWithComments($article_id);
+            return [ 'success' => true];
         } catch (\Exception $e) {
             return ['success' => false, 'message' => $e->getMessage()];
         }
 
-        return [
-            'success' => true,
-            'article' => $article
-        ];
+
     }
 
 
@@ -215,7 +240,14 @@ class ArticlesController extends Controller
                 'comment_id' => 'required|integer',
             ])->validate();
 
-            $this->commentService->delete($comment_id, Auth::guard()->user()->id);
+            $cUser = Auth::guard()->user();
+
+            if(!$this->commentService->hasUserAccessComment($cUser, $comment_id)){
+                throw new CommentException('Это не Ваш комментарий...');
+            }
+
+            $this->commentService->delete($comment_id);
+
         } catch (ValidationException $e) {
             return ['success' => false, 'message' => $e->errors()];
         } catch (CommentException $e) {
