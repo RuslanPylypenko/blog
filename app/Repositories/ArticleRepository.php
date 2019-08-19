@@ -24,6 +24,12 @@ class ArticleRepository extends ARepository
             ->paginate($perPage);
     }
 
+    public function setFilter($field, $values)
+    {
+        $this->model = $this->model->whereIn($field, $values);
+        return $this;
+    }
+
     /**
      * @param $id
      * @return mixed
@@ -45,7 +51,10 @@ class ArticleRepository extends ARepository
         return $this->model->where('id', $id)->delete();
     }
 
-
+    /**
+     * @param $id
+     * @return mixed
+     */
     public function getPrice($id)
     {
         return $this->model

@@ -7,6 +7,7 @@ use App\Entities\Comment;
 use App\Entities\PointsTransaction;
 use App\Repositories\ArticleRepository;
 use App\Repositories\CommentRepository;
+use App\Repositories\Feeds\RedisFeedsRepository;
 use App\Repositories\OrderArticle\RedisOrderArticle;
 use App\Repositories\PointsRepository;
 use App\Repositories\Subscribe\RedisSubscribeRepository;
@@ -14,6 +15,7 @@ use App\Repositories\UserRepository;
 use App\Services\ArticleOrderService;
 use App\Services\ArticleService;
 use App\Services\CommentService;
+use App\Services\FeedService;
 use App\Services\PointService;
 use App\Services\UserService;
 use App\User;
@@ -61,6 +63,14 @@ class AppServiceProvider extends ServiceProvider
                     new PointsRepository(new PointsTransaction()),
                     new UserRepository(new User())
                 )
+            );
+        });
+
+        $this->app->bind(FeedService::class, function () {
+            return new FeedService(
+                new RedisFeedsRepository(),
+                new RedisSubscribeRepository(),
+                new ArticleRepository(new Article())
             );
         });
     }

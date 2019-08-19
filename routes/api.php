@@ -70,3 +70,10 @@ Route::post('articles/{article_id}/comment/create', 'Rest\CommentController@crea
 
 Route::delete('comment/{comment_id}/delete', 'Rest\CommentController@delete')
     ->middleware('api.auth')->name('comment.delete');
+
+
+
+#feed
+
+Route::get('feeds', 'Rest\FeedsController@index')
+    ->middleware('api.auth')->name('feeds.list');

@@ -9,6 +9,8 @@ use App\Http\Requests\StoreArticlePost;
 use App\Http\Requests\UpdateArticlePost;
 use App\Services\ArticleOrderService;
 use App\Services\ArticleService;
+use App\Services\FeedService;
+use App\Services\UserService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -27,18 +29,28 @@ class ArticlesController extends Controller
      */
     private $articleOrderService;
 
+
+
+    /**
+     * @var FeedService
+     */
+    private $feedService;
+
     /**
      * ArticlesController constructor.
      * @param ArticleService $articleService
      * @param ArticleOrderService $articleOrderService
+     * @param FeedService $feedService
      */
     public function __construct(
         ArticleService $articleService,
-        ArticleOrderService $articleOrderService
+        ArticleOrderService $articleOrderService,
+        FeedService $feedService
     )
     {
         $this->articleService = $articleService;
         $this->articleOrderService = $articleOrderService;
+        $this->feedService = $feedService;
     }
 
     /**
@@ -84,13 +96,17 @@ class ArticlesController extends Controller
     public function create(StoreArticlePost $articlePost)
     {
         try {
+            $cUser = Auth::guard()->user();
             $data = [
                 'title' => $articlePost->input('title'),
                 'text' => $articlePost->input('text'),
                 'price' => $articlePost->input('price'),
-                'user_id' => Auth::guard()->user()->id,
+                'user_id' => $cUser->id,
             ];
             $article = $this->articleService->createArticle($data);
+
+            $this->feedService->addArticles($article->id, $cUser);
+
             return ['success' => true, 'message' => $article];
         } catch (\Exception $e) {
             return ['success' => false, 'message' => $e->getMessage()];

@@ -4,6 +4,7 @@
 namespace App\Http\Controllers\Rest;
 
 use App\Exceptions\CommentException;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\CreateComment;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
@@ -11,7 +12,7 @@ use App\Services\CommentService;
 use App\Services\ArticleService;
 use Illuminate\Support\Facades\Auth;
 
-class CommentController
+class CommentController extends Controller
 {
 
     /**
