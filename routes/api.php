@@ -65,8 +65,8 @@ Route::match(['get', 'post'], 'articles/{id}/buy', 'Rest\ArticlesController@buy'
 
 #Comments
 
-Route::post('articles/{article_id}/comment/create', 'Rest\ArticlesController@createComment')
+Route::post('articles/{article_id}/comment/create', 'Rest\CommentController@create')
     ->middleware('api.auth')->name('comment.create');
 
-Route::delete('comment/{comment_id}/delete', 'Rest\ArticlesController@deleteComment')
+Route::delete('comment/{comment_id}/delete', 'Rest\CommentController@delete')
     ->middleware('api.auth')->name('comment.delete');

@@ -4,18 +4,13 @@
 namespace App\Http\Controllers\Rest;
 
 
-use App\Exceptions\CommentException;
+
 use App\Http\Controllers\Controller;
-use App\Http\Requests\CreateComment;
 use App\Http\Requests\StoreArticlePost;
 use App\Http\Requests\UpdateArticlePost;
 use App\Services\ArticleService;
-use App\Services\CommentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\ValidationException;
-use Symfony\Component\HttpFoundation\Response;
 
 class ArticlesController extends Controller
 {
@@ -26,24 +21,15 @@ class ArticlesController extends Controller
      */
     private $articleService;
 
-    /**
-     * @var CommentService
-     */
-    private $commentService;
 
 
     /**
      * ArticlesController constructor.
      * @param ArticleService $articleService
-     * @param CommentService $commentService
      */
-    public function __construct(
-        ArticleService $articleService,
-        CommentService $commentService
-    )
+    public function __construct(ArticleService $articleService)
     {
         $this->articleService = $articleService;
-        $this->commentService = $commentService;
     }
 
     /**
@@ -196,68 +182,4 @@ class ArticlesController extends Controller
         ];
     }
 
-
-    /**
-     * @param $article_id
-     * @param CreateComment $request
-     * @return array
-     */
-    public function createComment($article_id, CreateComment $request)
-    {
-        try {
-
-            $cUser = Auth::guard()->user();
-
-            if(!$this->articleService->hasUserCommentArticle($cUser, $article_id)){
-                throw new \Exception('Невозможно добавить комментарий...');
-            }
-
-            $comment = [
-                'text' => $request->input('text'),
-                'user_id' => $cUser->id,
-                'article_id' => $article_id
-            ];
-
-            $this->commentService->createComment($cUser, $comment);
-
-            return [ 'success' => true];
-        } catch (\Exception $e) {
-            return ['success' => false, 'message' => $e->getMessage()];
-        }
-
-
-    }
-
-
-    /**
-     * @param $comment_id
-     * @return array
-     */
-    public function deleteComment($comment_id)
-    {
-        try {
-            Validator::make(['comment_id' => $comment_id], [
-                'comment_id' => 'required|integer',
-            ])->validate();
-
-            $cUser = Auth::guard()->user();
-
-            if(!$this->commentService->hasUserAccessComment($cUser, $comment_id)){
-                throw new CommentException('Это не Ваш комментарий...');
-            }
-
-            $this->commentService->delete($comment_id);
-
-        } catch (ValidationException $e) {
-            return ['success' => false, 'message' => $e->errors()];
-        } catch (CommentException $e) {
-            return ['success' => false, 'message' => $e->getMessage()];
-        } catch (\Exception $e) {
-            return ['success' => false, 'message' => $e->getMessage()];
-        }
-
-        return [
-            'success' => true,
-        ];
-    }
 }

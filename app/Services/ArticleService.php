@@ -139,7 +139,7 @@ class ArticleService
      * @param $articleId
      * @return bool
      */
-    public function hasUserCommentArticle(User $user, $articleId)
+    public function isAvailavleArticle(User $user, $articleId)
     {
         return $this->repository->exists(['id' => $articleId, 'status' => 1]);
     }
