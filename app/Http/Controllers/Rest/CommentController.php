@@ -49,7 +49,7 @@ class CommentController
 
             $cUser = Auth::guard()->user();
 
-            if(!$this->articleService->isAvailavleArticle($cUser, $article_id)){
+            if(!$this->articleService->isAvailableArticle($cUser, $article_id)){
                 throw new \Exception('Невозможно добавить комментарий...');
             }
 

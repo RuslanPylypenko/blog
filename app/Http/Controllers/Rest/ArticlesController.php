@@ -4,10 +4,10 @@
 namespace App\Http\Controllers\Rest;
 
 
-
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreArticlePost;
 use App\Http\Requests\UpdateArticlePost;
+use App\Services\ArticleOrderService;
 use App\Services\ArticleService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -22,14 +22,23 @@ class ArticlesController extends Controller
     private $articleService;
 
 
+    /**
+     * @var ArticleOrderService
+     */
+    private $articleOrderService;
 
     /**
      * ArticlesController constructor.
      * @param ArticleService $articleService
+     * @param ArticleOrderService $articleOrderService
      */
-    public function __construct(ArticleService $articleService)
+    public function __construct(
+        ArticleService $articleService,
+        ArticleOrderService $articleOrderService
+    )
     {
         $this->articleService = $articleService;
+        $this->articleOrderService = $articleOrderService;
     }
 
     /**
@@ -51,14 +60,15 @@ class ArticlesController extends Controller
     }
 
     /**
-     * @param null $id
-     * @return array|mixed
+     * @param $id
+     * @return \App\Entities\Article|array|mixed
      */
-    public function show($id = null)
+    public function show($id)
     {
         try {
-            $cUser = Auth::guard()->user();
-            $article = $this->articleService->showArticle($id, $cUser);
+            $userId = Auth::guest() ? null : Auth::guard()->user()->id;
+
+            $article = $this->articleService->showArticle($id, $userId);
             $this->articleService->addView($id);
         } catch (\Exception $e) {
             return ['success' => false, 'message' => $e->getMessage()];
@@ -86,7 +96,6 @@ class ArticlesController extends Controller
             return ['success' => false, 'message' => $e->getMessage()];
         }
 
-
     }
 
 
@@ -100,7 +109,7 @@ class ArticlesController extends Controller
         try {
 
             $cUser = Auth::guard()->user();
-            if(!$this->articleService->hasUserAccessToArticle($cUser, $id)){
+            if (!$this->articleService->hasUserAccessToArticle($cUser, $id)) {
                 throw new \Exception('Вы не можете удалять статью...');
             }
 
@@ -132,7 +141,7 @@ class ArticlesController extends Controller
     {
         try {
             $cUser = Auth::guard()->user();
-            if(!$this->articleService->hasUserAccessToArticle($cUser, $id)){
+            if (!$this->articleService->hasUserAccessToArticle($cUser, $id)) {
                 throw new \Exception('Вы не можете удалять статью...');
             }
             $this->articleService->deleteArticle($id);
@@ -169,17 +178,36 @@ class ArticlesController extends Controller
     {
         try {
             $cUser = Auth::guard()->user();
-            if(!$this->articleService->hasUserAccessToArticle($cUser, $id)){
+            if (!$this->articleService->hasUserAccessToArticle($cUser, $id)) {
                 throw new \Exception('Вы не можете скрыть статью...');
             }
             $this->articleService->disableArticle($id);
+            return ['success' => true];
         } catch (\Exception $e) {
             return ['success' => false, 'message' => $e->getMessage()];
         }
+    }
 
-        return [
-            'success' => true
-        ];
+
+    public function buy($articleId)
+    {
+        try {
+            $cUser = Auth::guard()->user();
+
+            if (!$this->articleService->isAvailableArticle($articleId)) {
+                throw new \Exception('Вы не можете купить статью...');
+            }
+            if($this->articleOrderService->hasUserArticle($articleId, $cUser)){
+                throw new \Exception('Вы уже купили эту статью...');
+            }
+
+            $article = $this->articleService->find($articleId);
+
+            $this->articleOrderService->buyArticle($article, $cUser);
+            return ['success' => true];
+        } catch (\Exception $e) {
+            return ['success' => false, 'message' => $e->getMessage()];
+        }
     }
 
 }

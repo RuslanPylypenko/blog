@@ -41,8 +41,7 @@ Route::get('users/{id}/followers', 'Rest\UserController@getFollowers')
 
 Route::resource('articles', 'Rest\ArticlesController')->only([
     'index', 'show'
-]);
-
+])->middleware('api.auth.not-required');
 
 Route::post('articles/create', 'Rest\ArticlesController@create')
     ->middleware('api.auth')->name('articles.create');
@@ -60,7 +59,8 @@ Route::patch('articles/{id}/disable', 'Rest\ArticlesController@disableArticle')
 Route::post('articles/{id}/update', 'Rest\ArticlesController@update')
     ->middleware('api.auth')->name('articles.update');
 
-Route::match(['get', 'post'], 'articles/{id}/buy', 'Rest\ArticlesController@buy')->name('articles.buy');
+Route::match(['get', 'post'], 'articles/{id}/buy', 'Rest\ArticlesController@buy')
+    ->middleware('api.auth')->name('articles.buy');
 
 
 #Comments

@@ -34,7 +34,7 @@ class Article extends Model
 
     public function user()
     {
-        return $this->hasOne(User::class, 'id')->select(['id', 'name', 'email']);
+        return $this->hasOne(User::class, 'id')->select(['id', 'name', 'email', 'points']);
     }
 
     public function comments()

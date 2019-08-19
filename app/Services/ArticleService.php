@@ -8,6 +8,7 @@ use App\Decorators\ArticleFullTextDecorator;
 use App\Entities\Article;
 use App\Helpers\StringHelper;
 use App\Repositories\ArticleRepository;
+use App\Repositories\OrderArticle\OrderArticleInterface;
 use App\User;
 use Faker\Factory as Faker;
 use Illuminate\Support\Facades\File;
@@ -20,21 +21,33 @@ class ArticleService
      */
     private $repository;
 
+
+    /**
+     * @var OrderArticleInterface
+     */
+    private $orderArticleRepository;
+
+
     /**
      * ArticleService constructor.
      * @param ArticleRepository $repository
+     * @param OrderArticleInterface $orderArticleRepository
      */
-    public function __construct(ArticleRepository $repository)
+    public function __construct(
+        ArticleRepository $repository,
+        OrderArticleInterface $orderArticleRepository
+    )
     {
         $this->repository = $repository;
+        $this->orderArticleRepository = $orderArticleRepository;
     }
 
 
-    public function showArticle($articleId, $cUser)
+    public function showArticle($articleId, $user_id)
     {
         $article = $this->find($articleId);
 
-        if ($article->price > 0) {
+        if ($article->price > 0 && !$this->orderArticleRepository->hasUserArticle($articleId, $user_id)) {
             $decorator = new ArticleFullTextDecorator($article);
             $article = $decorator->decorate();
         }
@@ -135,11 +148,10 @@ class ArticleService
 
 
     /**
-     * @param User $user
      * @param $articleId
-     * @return bool
+     * @return mixed
      */
-    public function isAvailavleArticle(User $user, $articleId)
+    public function isAvailableArticle($articleId)
     {
         return $this->repository->exists(['id' => $articleId, 'status' => 1]);
     }

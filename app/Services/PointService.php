@@ -6,7 +6,6 @@ namespace App\Services;
 use App\Repositories\PointsRepository;
 use App\Repositories\UserRepository;
 use App\User;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class PointService
@@ -67,25 +66,27 @@ class PointService
     }
 
     /**
-     * @param $user_id
+     * @param User $user
+     * @param User $cUser
      * @param $data
      * @throws \Exception
      */
     public function sendPointTransaction(User $user, User $cUser, $data)
     {
-        if ($this->isAvailablePoints($cUser, $data['points'])) {
-            try {
-                DB::beginTransaction();
-
-                $this->removeUserPoints($cUser, $data);
-                $this->addUserPoints($user, $data);
-
-                DB::commit();
-            } catch (\Exception $e) {
-                DB::rollBack();
-            }
-        }else{
+        if (!$this->isAvailablePoints($cUser, $data['points'])) {
             throw new \Exception('У Вас недостаточно на счету!');
+        }
+
+        try {
+            DB::beginTransaction();
+
+            $this->addUserPoints($user, $data);
+            $this->removeUserPoints($cUser, $data);
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw new \Exception($e->getMessage());
         }
 
     }
