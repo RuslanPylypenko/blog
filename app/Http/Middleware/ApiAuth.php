@@ -21,7 +21,7 @@ class ApiAuth
         $token = $request->input('token');
 
         if(!$token || !$User = User::where('api_token', $token)->first()) {
-            throw new NotFoundHttpException('invalid token');
+            response()->json(['success' => false, 'message' => 'invalid token'])->send();
         }
         if($User){
             Auth::login($User);
