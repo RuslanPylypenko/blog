@@ -6,7 +6,6 @@ namespace App\Services;
 
 use App\Entities\Article;
 use App\Repositories\OrderArticle\OrderArticleInterface;
-use App\Repositories\UserRepository;
 use App\User;
 
 class ArticleOrderService
@@ -16,23 +15,14 @@ class ArticleOrderService
      */
     private $orderArticleRepository;
 
-
-    /**
-     * @var PointService;
-     */
-    private $pointService;
-
     /**
      * ArticleOrderService constructor.
      * @param OrderArticleInterface $orderArticleRepository
-     * @param PointService $pointService
      */
     public function __construct(
-        OrderArticleInterface $orderArticleRepository,
-        PointService $pointService
+        OrderArticleInterface $orderArticleRepository
     )
     {
-        $this->pointService = $pointService;
         $this->orderArticleRepository = $orderArticleRepository;
     }
 
@@ -43,9 +33,6 @@ class ArticleOrderService
      */
     public function buyArticle(Article $article, User $cUser)
     {
-        $data = ['points' => $article->price, 'message' => 'Покупка статьи'];
-        $this->pointService->sendPointTransaction($article->user, $cUser, $data);
-
         $this->orderArticleRepository->addArticleToUser($article->id, $cUser->id);
     }
 

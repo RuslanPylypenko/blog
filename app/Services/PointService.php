@@ -43,7 +43,6 @@ class PointService
         ]);
 
         if (!$isEarned) {
-
             try {
                 DB::beginTransaction();
 
@@ -61,7 +60,6 @@ class PointService
             } catch (\Exception $e) {
                 DB::rollBack();
             }
-
         }
     }
 

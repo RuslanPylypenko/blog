@@ -10,7 +10,8 @@ use App\Http\Requests\UpdateArticlePost;
 use App\Services\ArticleOrderService;
 use App\Services\ArticleService;
 use App\Services\FeedService;
-use App\Services\UserService;
+use App\Services\PointService;
+use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -23,13 +24,10 @@ class ArticlesController extends Controller
      */
     private $articleService;
 
-
     /**
      * @var ArticleOrderService
      */
     private $articleOrderService;
-
-
 
     /**
      * @var FeedService
@@ -37,20 +35,28 @@ class ArticlesController extends Controller
     private $feedService;
 
     /**
+     * @var PointService;
+     */
+    private $pointService;
+
+    /**
      * ArticlesController constructor.
      * @param ArticleService $articleService
      * @param ArticleOrderService $articleOrderService
      * @param FeedService $feedService
+     * @param PointService $pointService
      */
     public function __construct(
         ArticleService $articleService,
         ArticleOrderService $articleOrderService,
-        FeedService $feedService
+        FeedService $feedService,
+        PointService $pointService
     )
     {
         $this->articleService = $articleService;
         $this->articleOrderService = $articleOrderService;
         $this->feedService = $feedService;
+        $this->pointService = $pointService;
     }
 
     /**
@@ -59,16 +65,10 @@ class ArticlesController extends Controller
      */
     public function index(Request $request)
     {
-        try {
-            $sort = $request->input('sort', 'date');
-            $dir = $request->input('dir', 'created_at');
+        $sort = $request->input('sort', 'date');
+        $dir = $request->input('dir', 'created_at');
 
-            $articles = $this->articleService->get(self::ARTICLE_PER_PAGE, $sort, $dir);
-        } catch (\Exception $e) {
-            return ['success' => false, 'message' => $e->getMessage()];
-        }
-
-        return $articles;
+        return $this->articleService->get(self::ARTICLE_PER_PAGE, $sort, $dir);
     }
 
     /**
@@ -82,10 +82,10 @@ class ArticlesController extends Controller
 
             $article = $this->articleService->showArticle($id, $userId);
             $this->articleService->addView($id);
+            return $article;
         } catch (\Exception $e) {
             return ['success' => false, 'message' => $e->getMessage()];
         }
-        return $article;
     }
 
 
@@ -111,7 +111,6 @@ class ArticlesController extends Controller
         } catch (\Exception $e) {
             return ['success' => false, 'message' => $e->getMessage()];
         }
-
     }
 
 
@@ -123,11 +122,8 @@ class ArticlesController extends Controller
     public function update($id, UpdateArticlePost $articlePost)
     {
         try {
-
             $cUser = Auth::guard()->user();
-            if (!$this->articleService->hasUserAccessToArticle($cUser, $id)) {
-                throw new \Exception('Вы не можете удалять статью...');
-            }
+            $this->hasUserAccessToArticle($cUser, $id);
 
             $data = [
                 'title' => $articlePost->input('title'),
@@ -135,14 +131,9 @@ class ArticlesController extends Controller
                 'price' => $articlePost->input('price'),
             ];
 
-            foreach ($data as $item => &$value) {
-                if (!$data[$item]) unset($data[$item]);
-            }
-
             $this->articleService->updateArticle($id, $data);
 
-            $article = $this->articleService->find($id);
-            return ['success' => true, 'article' => $article];
+            return ['success' => true,];
         } catch (\Exception $e) {
             return ['success' => false, 'message' => $e->getMessage()];
         }
@@ -157,32 +148,27 @@ class ArticlesController extends Controller
     {
         try {
             $cUser = Auth::guard()->user();
-            if (!$this->articleService->hasUserAccessToArticle($cUser, $id)) {
-                throw new \Exception('Вы не можете удалять статью...');
-            }
+            $this->hasUserAccessToArticle($cUser, $id);
             $this->articleService->deleteArticle($id);
+            return ['success' => true];
         } catch (\Exception $e) {
             return ['success' => false, 'message' => $e->getMessage()];
         }
-
-        return ['success' => true];
     }
 
 
     /**
-     * @param null $id
-     * @return array|mixed
+     * @param $id
+     * @return array
      */
-    public function like($id = null)
+    public function like($id)
     {
         try {
-
-            $article = $this->articleService->find($id);
             $this->articleService->likeArticle($id);
+            return ['success' => true];
         } catch (\Exception $e) {
             return ['success' => false, 'message' => $e->getMessage()];
         }
-        return $article;
     }
 
 
@@ -194,9 +180,7 @@ class ArticlesController extends Controller
     {
         try {
             $cUser = Auth::guard()->user();
-            if (!$this->articleService->hasUserAccessToArticle($cUser, $id)) {
-                throw new \Exception('Вы не можете скрыть статью...');
-            }
+            $this->hasUserAccessToArticle($cUser, $id);
             $this->articleService->disableArticle($id);
             return ['success' => true];
         } catch (\Exception $e) {
@@ -213,16 +197,32 @@ class ArticlesController extends Controller
             if (!$this->articleService->isAvailableArticle($articleId)) {
                 throw new \Exception('Вы не можете купить статью...');
             }
-            if($this->articleOrderService->hasUserArticle($articleId, $cUser)){
+            if ($this->articleOrderService->hasUserArticle($articleId, $cUser)) {
                 throw new \Exception('Вы уже купили эту статью...');
             }
 
             $article = $this->articleService->find($articleId);
 
             $this->articleOrderService->buyArticle($article, $cUser);
+
+            $data = ['points' => $article->price, 'message' => 'Покупка статьи'];
+            $this->pointService->sendPointTransaction($article->user, $cUser, $data);
+
             return ['success' => true];
         } catch (\Exception $e) {
             return ['success' => false, 'message' => $e->getMessage()];
+        }
+    }
+
+    /**
+     * @param User $cUser
+     * @param $id
+     * @throws \Exception
+     */
+    private function hasUserAccessToArticle(User $cUser, $id)
+    {
+        if (!$this->articleService->hasUserAccessToArticle($cUser, $id)) {
+            throw new \Exception('Вы не можете выполнить это действие...');
         }
     }
 

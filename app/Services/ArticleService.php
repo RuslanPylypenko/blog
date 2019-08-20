@@ -15,18 +15,15 @@ use Illuminate\Support\Facades\File;
 
 class ArticleService
 {
-
     /**
      * @var ArticleRepository
      */
     private $repository;
 
-
     /**
      * @var OrderArticleInterface
      */
     private $orderArticleRepository;
-
 
     /**
      * ArticleService constructor.
@@ -91,10 +88,13 @@ class ArticleService
     /**
      * @param $id
      * @return mixed
+     * @throws \Exception
      */
     public function likeArticle($id)
     {
-        $article = $this->repository->findOne(['id' => $id]);
+        if(!$article = $this->repository->findOne(['id' => $id])){
+            throw new \Exception('Статья не найдена...');
+        }
         return $this->repository->update($id, ['likes' => ($article->likes + 1)]);
     }
 
@@ -127,12 +127,16 @@ class ArticleService
 
     /**
      * @param $id
-     * @param array $article
+     * @param array $data
      * @return mixed
      */
-    public function updateArticle($id, array $article)
+    public function updateArticle($id, array $data)
     {
-        return $this->repository->update($id, $article);
+        foreach ($data as $item => &$value) {
+            if (!$data[$item]) unset($data[$item]);
+        }
+
+        return $this->repository->update($id, $data);
     }
 
 
@@ -155,7 +159,6 @@ class ArticleService
     {
         return $this->repository->exists(['id' => $articleId, 'status' => 1]);
     }
-
 
 
     /**

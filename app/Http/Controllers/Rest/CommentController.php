@@ -50,17 +50,17 @@ class CommentController extends Controller
 
             $cUser = Auth::guard()->user();
 
-            if(!$this->articleService->isAvailableArticle($cUser, $article_id)){
+            if(!$this->articleService->isAvailableArticle($article_id)){
                 throw new \Exception('Невозможно добавить комментарий...');
             }
 
-            $comment = [
+            $data = [
                 'text' => $request->input('text'),
                 'user_id' => $cUser->id,
                 'article_id' => $article_id
             ];
 
-            $this->commentService->createComment($cUser, $comment);
+            $this->commentService->createComment($cUser, $data);
 
             return [ 'success' => true];
         } catch (\Exception $e) {

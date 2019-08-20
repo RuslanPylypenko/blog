@@ -51,7 +51,6 @@ class CommentService
 
     /**
      * @param $comment_id
-     * @param $user_id
      * @return mixed
      */
     public function delete($comment_id)

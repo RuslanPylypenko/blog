@@ -16,7 +16,6 @@ class FeedService
      */
     private $feedsRepository;
 
-
     /**
      * @var SubscribeInterface
      */

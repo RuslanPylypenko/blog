@@ -58,11 +58,7 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->bind(ArticleOrderService::class, function () {
             return new ArticleOrderService(
-                new RedisOrderArticle(),
-                new PointService(
-                    new PointsRepository(new PointsTransaction()),
-                    new UserRepository(new User())
-                )
+                new RedisOrderArticle()
             );
         });
 
