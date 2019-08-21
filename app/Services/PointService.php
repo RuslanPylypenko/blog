@@ -35,32 +35,59 @@ class PointService
         $this->userRepository = $userRepository;
     }
 
+    /**
+     * @param User $user
+     */
     public function addPointsForRegistration(User $user)
     {
-        $isEarned = $this->pointsRepository->exists([
+        try {
+
+            $this->throwIfEarned($user, self::REGISTRATION_TYPE_OPERATION);
+
+            DB::beginTransaction();
+
+            $this->userRepository->update($user->id, ['points' => ($user->points += self::POINTS_FOR_REGISTER)]);
+            $this->pointsRepository->create([
+                'amount' => self::POINTS_FOR_REGISTER,
+                'user_id' => $user->id,
+                'type_operation' => self::REGISTRATION_TYPE_OPERATION,
+                'message' => 'hello world',
+                'points_after_transaction' => $user->points
+            ]);
+
+            DB::commit();
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+        }
+
+    }
+
+    /**
+     * @param User $user
+     * @param $type
+     * @throws \Exception
+     */
+    private function throwIfEarned(User $user, $type)
+    {
+        if ($this->isEarned($user, $type)) {
+            throw new \Exception('Транзакция уже была проведена');
+        }
+    }
+
+
+    /**
+     * @param User $user
+     * @param $type
+     * @return mixed
+     */
+    private function isEarned(User $user, $type)
+    {
+        return $this->pointsRepository->exists([
             'user_id' => $user->id,
-            'type_operation' => self::REGISTRATION_TYPE_OPERATION
+            'type_operation' => $type
         ]);
 
-        if (!$isEarned) {
-            try {
-                DB::beginTransaction();
-
-                $this->userRepository->update($user->id, ['points' => ($user->points += self::POINTS_FOR_REGISTER)]);
-                $this->pointsRepository->create([
-                    'amount' => self::POINTS_FOR_REGISTER,
-                    'user_id' => $user->id,
-                    'type_operation' => self::REGISTRATION_TYPE_OPERATION,
-                    'message' => 'hello world',
-                    'points_after_transaction' => $user->points
-                ]);
-
-                DB::commit();
-
-            } catch (\Exception $e) {
-                DB::rollBack();
-            }
-        }
     }
 
     /**

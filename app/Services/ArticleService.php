@@ -105,6 +105,19 @@ class ArticleService
      */
     public function createArticle(array $article)
     {
+        $article['likes'] = 0;
+        $article['views'] = 0;
+        $article['image'] = $this->uploadImage();
+        $article['short_text'] = StringHelper::getHortText($article['text'], Article::SHORT_TEXT_LENGTH);
+
+        return $this->repository->create($article);
+    }
+
+    /**
+     * @return string
+     */
+    private function uploadImage()
+    {
         $faker = Faker::create();
 
         $image_folder = '/storage/images/';
@@ -114,14 +127,7 @@ class ArticleService
             File::makeDirectory($filepath);
         }
 
-        $image = $image_folder . $faker->image($filepath, 400, 300, false, false);
-
-        $article['likes'] = 0;
-        $article['views'] = 0;
-        $article['image'] = $image;
-        $article['short_text'] = StringHelper::getHortText($article['text'], Article::SHORT_TEXT_LENGTH);
-
-        return $this->repository->create($article);
+        return $image_folder . $faker->image($filepath, 400, 300, false, false);
     }
 
 
@@ -132,11 +138,18 @@ class ArticleService
      */
     public function updateArticle($id, array $data)
     {
+        return $this->repository->update($id, $this->unsetEmptyKey($data));
+    }
+
+    /**
+     * @param $data
+     * @return mixed
+     */
+    private function unsetEmptyKey($data){
         foreach ($data as $item => &$value) {
             if (!$data[$item]) unset($data[$item]);
         }
-
-        return $this->repository->update($id, $data);
+        return $data;
     }
 
 

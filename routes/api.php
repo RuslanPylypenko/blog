@@ -51,7 +51,7 @@ Route::post('articles/{id}/like', 'Rest\ArticlesController@like')
 
 
 
-Route::delete('articles/{id}', 'Rest\ArticlesController@delete')->name('articles.delete');
+Route::delete('articles/{id}/delete', 'Rest\ArticlesController@delete')->name('articles.delete');
 
 Route::patch('articles/{id}/disable', 'Rest\ArticlesController@disableArticle')
     ->middleware('api.auth')->name('articles.update');
